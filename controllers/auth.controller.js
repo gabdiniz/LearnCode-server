@@ -14,7 +14,7 @@ const register = async (req, res) => {
   } = req.body;
   try {
     const user = await User.findOne({ where: { email } });
-    if (user) return res.status(400).json({ message: "E-mail já cadastrado" });
+    if (user) return res.status(400).json({ message: "E-mail já cadastrado." });
 
     const saltRounds = 10;
     const hashedPassword = await bycrypt.hash(password, saltRounds);
@@ -41,7 +41,7 @@ const login = async (req, res) => {
   try {
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(404).json({ message: "Usuário não existe." });
-    
+
     const correctPassword = await bycrypt.compare(password, user.password);
     if (!correctPassword) return res.status(400).json({ message: "Senha incorreta." });
 
@@ -53,4 +53,23 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const updatePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  try {
+    const user = await User.findByPk(req.auth.id);
+
+    const correctPassword = await bycrypt.compare(currentPassword, user.password);
+    if (!correctPassword) return res.status(400).json({ message: "Senha incorreta." });
+
+    const saltRounds = 10;
+    const hashedPassword = await bycrypt.hash(newPassword, saltRounds);
+
+    await user.update({ password: hashedPassword });
+    return res.status(200).json({ message: "Senha editada com sucesso!" })
+  }
+  catch (err) {
+    return res.status(500).json({ message: "Ocorreu um erro." });
+  }
+}
+
+module.exports = { register, login, updatePassword };
