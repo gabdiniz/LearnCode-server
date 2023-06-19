@@ -8,11 +8,12 @@ app.use(express.json());
 app.use(cors({ origin: "http://localhost:3000" }));
 
 const routeAuth = require("./routes/auth.routes");
-const routerUsers = require("./routes/users");
-
+const routeUsers = require("./routes/users");
+const routeCategories = require("./routes/categories");
 
 app.use(routeAuth);
-app.use(routerUsers);
+app.use(routeUsers);
+app.use(routeCategories);
 
 
 authenticate(connection);
