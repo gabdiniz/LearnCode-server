@@ -15,7 +15,6 @@ app.use(routeAuth);
 app.use(routeUsers);
 app.use(routeCategories);
 
-
 authenticate(connection);
 connection.sync();
 
