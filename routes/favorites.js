@@ -26,7 +26,7 @@ router.post("/favorites", authMiddleware(), async (req, res) => {
     if (!course) return res.status(404).json({ message: "Curso não encontrado." });
 
     const favoriteExists = await Favorite.findOne({ where: { courseId, userId: id } });
-    if (favoriteExists) return res.status(200).json({ message: "Curso já favoritado." });
+    if (favoriteExists) return res.status(400).json({ message: "Curso já favoritado." });
     
     const favorite = await Favorite.create({ courseId, userId: id });
     return res.status(201).json(favorite);

@@ -2,6 +2,8 @@ const { Router } = require("express");
 const Course = require("../models/course");
 const authMiddleware = require("../middlewares/auth.middleware");
 const Category = require("../models/category");
+const Like = require("../models/like");
+const { fn, col, literal } = require("sequelize");
 
 const router = Router();
 
@@ -26,6 +28,22 @@ router.get("/courses/search", async (req, res) => {
     const totalPages = Math.ceil(count / pageSize);
     const last = (rows.length < 10);
     return res.json({ courses: rows, page, pageSize, totalPages, totalCount: count, last });
+  }
+  catch (err) {
+    return res.status(500).json({ message: "Ocorreu um erro." });
+  }
+});
+
+router.get("/courses/popular", async (req, res) => {
+  try {
+    const likes = await Like.findAll({
+      attributes: [[fn("COUNT", col('courseId')), "likes"]],
+      group: ['courseId'],
+      order: [[literal('likes'), 'DESC']],
+      limit: 5,
+      include: Course
+    });
+    res.status(200).json(likes);
   }
   catch (err) {
     return res.status(500).json({ message: "Ocorreu um erro." });
