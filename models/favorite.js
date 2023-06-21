@@ -9,6 +9,10 @@ const Favorite = connection.define('favorite', {
     defaultValue: DataTypes.UUIDV4,
     allowNull: false,
     primaryKey: true
+  },
+  courseId: {
+    type: DataTypes.UUID,
+    unique: true
   }
 });
 
