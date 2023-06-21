@@ -3,7 +3,7 @@ const { connection } = require("../config/database");
 const User = require("./user");
 const Course = require("./course");
 
-const Favorite = connection.define('favorite', {
+const Like = connection.define('like', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -12,10 +12,11 @@ const Favorite = connection.define('favorite', {
   }
 });
 
-User.hasMany(Favorite);
-Favorite.belongsTo(User);
+User.hasMany(Like);
+Like.belongsTo(User);
 
-Course.hasMany(Favorite);
-Favorite.belongsTo(Course);
+Course.hasMany(Like);
+Like.belongsTo(Course);
 
-module.exports = Favorite;
+module.exports = Like;
+

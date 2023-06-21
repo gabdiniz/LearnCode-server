@@ -25,11 +25,13 @@ router.post("/favorites", authMiddleware(), async (req, res) => {
     const course = await Course.findByPk(courseId);
     if (!course) return res.status(404).json({ message: "Curso não encontrado." });
 
+    const favoriteExists = await Favorite.findOne({ where: { courseId, userId: id } });
+    if (favoriteExists) return res.status(200).json({ message: "Curso já favoritado." });
+    
     const favorite = await Favorite.create({ courseId, userId: id });
     return res.status(201).json(favorite);
   }
   catch (err) {
-    if (err.name === "SequelizeUniqueConstraintError") return res.status(200).json();
     return res.status(500).json({ message: "Ocorreu um erro." });
   }
 });
