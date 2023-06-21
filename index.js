@@ -7,7 +7,7 @@ const routeUsers = require("./routes/users");
 const routeCategories = require("./routes/categories");
 const routeCourses = require("./routes/courses");
 const routeFavorites = require("./routes/favorites");
-const Like = require("./models/like");
+const routeLikes = require("./routes/likes");
 
 const app = express();
 
@@ -19,7 +19,7 @@ app.use(routeUsers);
 app.use(routeCategories);
 app.use(routeCourses);
 app.use(routeFavorites);
-
+app.use(routeLikes);
 
 authenticate(connection);
 connection.sync();
