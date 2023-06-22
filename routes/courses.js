@@ -4,6 +4,7 @@ const authMiddleware = require("../middlewares/auth.middleware");
 const Category = require("../models/category");
 const Like = require("../models/like");
 const { fn, col, literal } = require("sequelize");
+const Episode = require("../models/episode");
 
 const router = Router();
 
@@ -49,6 +50,23 @@ router.get("/courses/popular", async (req, res) => {
     return res.status(500).json({ message: "Ocorreu um erro." });
   }
 });
+
+router.get("/courses/:id", authMiddleware(), async (req, res) => {
+  const { id } = req.params;
+  const userId = req.auth.id;
+  try {
+    const course = await Course.findByPk(id);
+    if (!course) return res.status(404).json({ message: "Curso não encontrado." });
+
+    const episodes = await Episode.findAll({ where: {courseId: id}, order: [['order', 'ASC']]})
+
+    const likeIsTrue = ((await Like.findOne({ where: { courseId: id, userId } }))) ? true : false;
+    return res.status(200).json({ course, episodes, like: likeIsTrue });
+  }
+  catch (err) {
+    return res.status(500).json({ message: "Ocorreu um erro." });
+  }
+})
 
 router.post("/courses", authMiddleware(), async (req, res) => {
   const { name, synopsis, thumbnail_url, featured, categoryId } = req.body;

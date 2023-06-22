@@ -8,6 +8,7 @@ const routeCategories = require("./routes/categories");
 const routeCourses = require("./routes/courses");
 const routeFavorites = require("./routes/favorites");
 const routeLikes = require("./routes/likes");
+const routeEpisodes = require("./routes/episodes");
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(routeCategories);
 app.use(routeCourses);
 app.use(routeFavorites);
 app.use(routeLikes);
+app.use(routeEpisodes);
 
 authenticate(connection);
 connection.sync();
