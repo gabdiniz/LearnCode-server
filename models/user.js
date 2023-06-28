@@ -22,7 +22,6 @@ const User = connection.define('user', {
   },
   birth: {
     type: DataTypes.DATEONLY,
-    allowNull: false,
   },
   email: {
     type: DataTypes.STRING,
