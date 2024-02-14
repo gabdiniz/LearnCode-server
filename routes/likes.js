@@ -27,7 +27,10 @@ router.post("/likes", authMiddleware(), async (req, res) => {
     if (!course) return res.status(404).json({ message: "Curso não encontrado." });
 
     const likeExists = await Like.findOne({ where: { courseId, userId: id } });
-    if (likeExists) return res.status(400).json({ message: "Curso já curtido." });
+    if (likeExists) {
+      likeExists.destroy();
+      return res.status(200).json({ message: "'Gostei' removido." })
+    };
 
     const like = await Like.create({ courseId, userId: id });
     return res.status(201).json(like);

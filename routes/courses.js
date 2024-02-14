@@ -3,8 +3,11 @@ const Course = require("../models/course");
 const authMiddleware = require("../middlewares/auth.middleware");
 const Category = require("../models/category");
 const Like = require("../models/like");
-const { fn, col, literal } = require("sequelize");
+const { fn, col, literal, Sequelize } = require("sequelize");
 const Episode = require("../models/episode");
+const WatchTime = require("../models/watch_time");
+const Favorite = require("../models/favorite");
+
 
 const router = Router();
 
@@ -55,13 +58,32 @@ router.get("/courses/:id", authMiddleware(), async (req, res) => {
   const { id } = req.params;
   const userId = req.auth.id;
   try {
-    const course = await Course.findByPk(id);
+    const course = await Course.findOne({
+      where: { id },
+      include: [Episode],
+      order: [[{ model: Episode }, 'order', 'ASC']]
+    });
+
     if (!course) return res.status(404).json({ message: "Curso não encontrado." });
 
-    const episodes = await Episode.findAll({ where: {courseId: id}, order: [['order', 'ASC']]})
+    const watchTime = await WatchTime.findAll({
+      where: {
+        episodeId: { [Sequelize.Op.in]: course.episodes.map((ep) => ep.id) },
+        userId: userId
+      }
+    })
+
+    course.episodes.map((ep) => {
+      ep.dataValues.watchTime = watchTime.find((time) => time.episodeId == ep.id)?.seconds || 0;
+    })
 
     const likeIsTrue = ((await Like.findOne({ where: { courseId: id, userId } }))) ? true : false;
-    return res.status(200).json({ course, episodes, like: likeIsTrue });
+    const favoriteIsTrue = ((await Favorite.findOne({ where: { courseId: id, userId } }))) ? true : false;
+    
+    course.dataValues.like = likeIsTrue;
+    course.dataValues.favorite = favoriteIsTrue;
+
+    return res.status(200).json({ course });
   }
   catch (err) {
     return res.status(500).json({ message: "Ocorreu um erro." });
